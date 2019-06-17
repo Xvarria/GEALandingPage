@@ -8,6 +8,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script type="text/javascript" async="" src="./codes/analytics.js"></script>
     <script async="" src="./codes/js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LelJakUAAAAAMzX72hQIoX5AyFSBN_24TLECGdS&hl=es"></script>
 
     <!-- favicon -->
     <link rel="shortcut icon" href="./favicon/favicon.ico">
@@ -217,7 +218,7 @@
                     <div class="col-lg-2 col-md-2 col-sm d-sm col blank"></div>
                     <div class="col-lg-4 col-md-4 col-sm-12 col-12">
                         <div class="form-container">
-                            <form action="" method="POST" onsubmit="return validateContactForm()">
+                            <form id="contactUs" action="" method="POST">
                                 <input type="hidden" name="_next" value="contact-us-sent.html"/>
                                 <div class="form-item">
                                     <label>
@@ -249,8 +250,12 @@
                                     </label>
 
                                     <textarea type="text" id="message"  name="message" placeholder="Escriba su comentario"></textarea>
+                                    <br>
+                                    <div style="display: none">
+                                        <textarea type="text" id="tokenOut"  name="tokenOut"></textarea>
+                                    </div>    
                                 </div>
-
+   
                                 <div class="form-item" id="statusMessage"> 
                                     <?php
                                     if (! empty($resultado)) {
@@ -260,15 +265,11 @@
                                     }
                                     ?>
                                 </div>
-
+                                <div class="g-recaptcha" data-sitekey="6LelJakUAAAAAMzX72hQIoX5AyFSBN_24TLECGdS"></div>
+        
                                 <div class="buttons-container">
-                                    <a href="contact-us-sent.html">
-                                        <button class="button full" type="submit" value="Send" name="send">
-                                        <span>Enviar</span>
-                                        </button>
-                                    </a>
+                                    <input type="button" value="Enviar" class="button full" onclick="javascript:validateContactForm();">
                                 </div>
-                                <?php echo $someVariable; ?>
                             </form>
                         </div>
                     </div>
@@ -348,39 +349,47 @@
     <script src="codes/vendors.min.js"></script>
     <script src="codes/main.js"></script>
     <script type="text/javascript">
+
         function validateContactForm() {
-            var valid = true;
+            form = $('form#contactUs');
+            grecaptcha.execute('6LelJakUAAAAAMzX72hQIoX5AyFSBN_24TLECGdS', {action: 'homepage'}).then(function(token) {
+                $("#tokenOut").val(token);
 
-            var firstName = $("#firstName").val();
-            var lastName = $("#lastName").val();
-            var message = $("#message").val();
-            var email = $("#email").val();
-            
-            if (firstName == "") {
-                alert('El nombre es requerido');
-                valid = false;
-            }
+                var valid = true;
 
-            if (lastName == "") {
-                alert('El apellido es requerido');
-                valid = false;
-            }
+                var firstName = $("#first-name").val();
+                var lastName = $("#last-name").val();
+                var message = $("#message").val();
+                var email = $("#email").val();
+                
+                if (firstName == "") {
+                    alert('El nombre es requerido');
+                    valid = false;
+                }
 
-            if (message == "") {
-                alert('El mensaje es requerido');
-                valid = false;
-            }
-            
-            if (email == "") {
-                alert('El email es requerido');
-                valid = false;
-            }
-            if (!userEmail.match(/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/))
-            {
-                alert('La dirección de correo es inválida');
-                valid = false;
-            }
-            return valid;
+                if (lastName == "") {
+                    alert('El apellido es requerido');
+                    valid = false;
+                }
+
+                if (message == "") {
+                    alert('El mensaje es requerido');
+                    valid = false;
+                }
+                
+                if (email == "") {
+                    alert('El email es requerido');
+                    valid = false;
+                }
+                if (!email.match(/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/)){
+                    alert('La dirección de correo es inválida');
+                    valid = false;
+                }
+                if (valid){
+                    $('div#statusMessage').append('<input name="form_submitted" value="1" type="hidden"/>');
+                    form.submit();
+                }
+            });
         }
 </script>
 
